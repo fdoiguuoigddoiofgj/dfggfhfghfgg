@@ -3,240 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blue Themed Rich Text Editor</title>
+  <title>For Kratika - A Special Proposal</title>
   <style>
-    /* Reset and base styling */
+    /* Basic Reset */
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
+
+    /* Body Styling with a romantic gradient */
     body {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
       height: 100vh;
-      background: #e8f0fe;
-      color: #333;
-    }
-    /* Blue-themed toolbar styling */
-    .toolbar {
-      background: linear-gradient(135deg, #4285f4, #3367d6);
-      padding: 8px;
-      border-bottom: 1px solid #2a56c6;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #fff;
     }
-    .toolbar button,
-    .toolbar select,
-    .toolbar input[type="color"] {
-      margin: 2px;
-      padding: 6px 8px;
-      font-size: 14px;
+
+    /* Main Container with Glassmorphism effect */
+    .proposal-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Title and Heart Icon */
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 20px;
+      font-family: 'Brush Script MT', cursive;
+    }
+    
+    .heart {
+      color: #ff3366;
+      font-size: 3em;
+      animation: beat 1.2s infinite;
+    }
+    
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* Message Styling */
+    .message {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      line-height: 1.4;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Button Styling */
+    .btn {
       border: none;
-      background: #fff;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
       cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.2s ease;
-    }
-    .toolbar button:hover,
-    .toolbar select:hover,
-    .toolbar input[type="color"]:hover {
-      background: #dce3fc;
-    }
-    .toolbar button:focus {
-      outline: none;
-    }
-    /* Editor styling */
-    #editor {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #fff;
-      border: 1px solid #d0e1fd;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       margin: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    #editor:focus {
-      outline: none;
+    
+    .yes-button {
+      background: #ff3366;
+      color: #fff;
     }
-    /* Status bar styling */
-    .status-bar {
-      background: #d0e1fd;
-      padding: 8px 15px;
-      border-top: 1px solid #a3c0f7;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    
+    .yes-button:hover {
+      background: #e62e5c;
+      transform: scale(1.05);
+    }
+    
+    .no-button {
+      background: #fff;
+      color: #ff3366;
+    }
+    
+    .no-button:hover {
+      background: #fce4ec;
+      transform: scale(1.05);
+    }
+
+    /* Floating Hearts Background */
+    .floating-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    
+    .floating-hearts i {
+      position: absolute;
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.8);
+      animation: float 8s ease-in infinite;
+      opacity: 0;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
     }
   </style>
+  <!-- Font Awesome for Heart Icons (Optional) -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+  
+  <!-- Floating Hearts Background -->
+  <div class="floating-hearts" id="floatingHearts"></div>
 
-  <!-- Toolbar with formatting options -->
-  <div class="toolbar">
-    <!-- Basic Formatting -->
-    <button onclick="execCmd('bold')" title="Bold"><b>B</b></button>
-    <button onclick="execCmd('italic')" title="Italic"><i>I</i></button>
-    <button onclick="execCmd('underline')" title="Underline"><u>U</u></button>
-    <button onclick="execCmd('strikeThrough')" title="Strike-through"><s>S</s></button>
-    
-    <!-- Alignment -->
-    <button onclick="execCmd('justifyLeft')" title="Align Left">Left</button>
-    <button onclick="execCmd('justifyCenter')" title="Center">Center</button>
-    <button onclick="execCmd('justifyRight')" title="Align Right">Right</button>
-    <button onclick="execCmd('justifyFull')" title="Justify">Justify</button>
-    
-    <!-- Lists -->
-    <button onclick="execCmd('insertUnorderedList')" title="Bullet List">&bull; List</button>
-    <button onclick="execCmd('insertOrderedList')" title="Numbered List">1. List</button>
-    
-    <!-- Undo/Redo -->
-    <button onclick="execCmd('undo')" title="Undo">Undo</button>
-    <button onclick="execCmd('redo')" title="Redo">Redo</button>
-    
-    <!-- Headings and Font Size -->
-    <select onchange="execCmdArg('formatBlock', this.value)" title="Heading Style">
-      <option value="">Paragraph</option>
-      <option value="H1">Heading 1</option>
-      <option value="H2">Heading 2</option>
-      <option value="H3">Heading 3</option>
-      <option value="H4">Heading 4</option>
-      <option value="H5">Heading 5</option>
-      <option value="H6">Heading 6</option>
-    </select>
-    <select onchange="execCmdArg('fontSize', this.value)" title="Font Size">
-      <option value="">Font Size</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-    </select>
-    
-    <!-- Font Family -->
-    <select onchange="execCmdArg('fontName', this.value)" title="Font Family">
-      <option value="">Font Family</option>
-      <option value="Arial">Arial</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Verdana">Verdana</option>
-    </select>
-    
-    <!-- Text Color and Background Color -->
-    <input type="color" onchange="execCmdArg('foreColor', this.value)" title="Font Color">
-    <input type="color" onchange="execCmdArg('hiliteColor', this.value)" title="Background Color">
-    
-    <!-- Link and Image -->
-    <button onclick="insertLink()" title="Insert Link">Link</button>
-    <button onclick="insertImage()" title="Insert Image">Image</button>
-    
-    <!-- Additional Tools -->
-    <button onclick="execCmd('removeFormat')" title="Clear Formatting">Clear Format</button>
-    <button onclick="execCmd('insertHorizontalRule')" title="Insert Horizontal Rule">HR</button>
-    <button onclick="execCmd('subscript')" title="Subscript">Sub</button>
-    <button onclick="execCmd('superscript')" title="Superscript">Sup</button>
-    <button onclick="execCmd('indent')" title="Indent">Indent</button>
-    <button onclick="execCmd('outdent')" title="Outdent">Outdent</button>
-    <button onclick="insertTable()" title="Insert Table">Table</button>
+  <!-- Proposal Content Container -->
+  <div class="proposal-container">
+    <h1>
+      My Dearest Kratika <i class="fas fa-heart heart"></i>
+    </h1>
+    <p class="message">
+      From the moment I met you, my heart knew you were the one. Every day with you feels like a dream come true. <br><br>
+      I cherish every smile, every laugh, and every moment we share. <br><br>
+      Will you make me the happiest person alive and share forever with me?
+    </p>
+    <div id="buttonContainer">
+      <!-- Yes and No Buttons -->
+      <button class="btn yes-button" onclick="proposalResponse()">Yes, I Will!</button>
+      <button class="btn no-button" onclick="noClicked()">No</button>
+    </div>
   </div>
-
-  <!-- Editable content area -->
-  <div id="editor" contenteditable="true">
-    <p>Start typing your document here...</p>
-  </div>
-
-  <!-- Status bar showing word count and auto-save status -->
-  <div class="status-bar">
-    <span id="wordCount">Words: 0</span>
-    <span id="saveStatus">Saved</span>
-  </div>
-
+  
   <script>
-    // Execute a command with no argument
-    function execCmd(command) {
-      document.execCommand(command, false, null);
-      updateWordCount();
+    // Counter for the number of times "No" was clicked
+    let noCount = 0;
+
+    // Function to handle when the "Yes" button is clicked
+    function proposalResponse() {
+      alert("I love you, Kratika! You made me the happiest person alive!");
     }
-    
-    // Execute a command with an argument
-    function execCmdArg(command, arg) {
-      document.execCommand(command, false, arg);
-      updateWordCount();
+
+    // Function to handle when a "No/Please" button is clicked
+    function noClicked() {
+      noCount++;
+      updateNoButtons();
     }
-    
-    // Insert a hyperlink
-    function insertLink() {
-      const url = prompt("Enter the URL for the link:", "https://");
-      if (url) {
-        document.execCommand('createLink', false, url);
+
+    // Update the "No" buttons with an escalating "Please" message
+    function updateNoButtons() {
+      const buttonContainer = document.getElementById('buttonContainer');
+      // Remove all existing "No" buttons (we keep the Yes button intact)
+      buttonContainer.innerHTML = `<button class="btn yes-button" onclick="proposalResponse()">Yes, I Will!</button>`;
+
+      // Create two new "No" buttons with an escalating message
+      // The message grows with each click, adding more "Please" and crying emojis.
+      const pleaseText = "Please" + "!".repeat(noCount) + " " + "😢".repeat(noCount);
+
+      // Create two buttons with the same message
+      for (let i = 0; i < 2; i++) {
+        const btn = document.createElement("button");
+        btn.className = "btn no-button";
+        btn.textContent = pleaseText;
+        btn.onclick = noClicked;
+        buttonContainer.appendChild(btn);
+      }
+    }
+
+    // Create floating hearts in the background
+    function createFloatingHearts() {
+      const heartContainer = document.getElementById('floatingHearts');
+      const heartCount = 20; // Number of hearts to generate
+      
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('i');
+        heart.className = "fas fa-heart";
+        // Random position and animation delay
+        heart.style.left = Math.random() * 100 + "%";
+        heart.style.animationDelay = Math.random() * 5 + "s";
+        heart.style.fontSize = (Math.random() * 24 + 16) + "px";
+        heartContainer.appendChild(heart);
       }
     }
     
-    // Insert an image by URL
-    function insertImage() {
-      const url = prompt("Enter the image URL:", "https://");
-      if (url) {
-        document.execCommand('insertImage', false, url);
-      }
-    }
-    
-    // Insert a table by prompting for rows and columns
-    function insertTable() {
-      const rows = parseInt(prompt("Enter number of rows:", "2"));
-      const cols = parseInt(prompt("Enter number of columns:", "2"));
-      if (rows > 0 && cols > 0) {
-        let table = '<table border="1" style="border-collapse: collapse; width:100%;">';
-        for (let i = 0; i < rows; i++) {
-          table += '<tr>';
-          for (let j = 0; j < cols; j++) {
-            table += '<td>&nbsp;</td>';
-          }
-          table += '</tr>';
-        }
-        table += '</table><br>';
-        document.execCommand('insertHTML', false, table);
-      }
-    }
-    
-    // Update the word count based on the editor's text
-    function updateWordCount() {
-      const editor = document.getElementById('editor');
-      const text = editor.innerText || "";
-      // Split by whitespace and filter out empty entries
-      const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-      document.getElementById('wordCount').textContent = 'Words: ' + words.length;
-    }
-    
-    // Auto-save the content every 5 seconds to localStorage
-    function saveContent() {
-      const content = document.getElementById('editor').innerHTML;
-      localStorage.setItem('editorContent', content);
-      document.getElementById('saveStatus').textContent = 'Saved at ' + new Date().toLocaleTimeString();
-    }
-    
-    // Load saved content when the page loads
-    window.onload = function() {
-      const savedContent = localStorage.getItem('editorContent');
-      if (savedContent) {
-        document.getElementById('editor').innerHTML = savedContent;
-      }
-      updateWordCount();
-    };
-    
-    // Set up auto-save interval (every 5 seconds)
-    setInterval(saveContent, 5000);
-    
-    // Update word count on user input events
-    const editor = document.getElementById('editor');
-    editor.addEventListener('keyup', updateWordCount);
-    editor.addEventListener('paste', () => setTimeout(updateWordCount, 100));
+    createFloatingHearts();
   </script>
 </body>
 </html>
