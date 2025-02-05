@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responsive Notes App</title>
+  <style>
+    /* Reset some default styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Base body styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Container for the notes app */
+    .container {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Form styling */
+    form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #5cb85c;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4cae4c;
+    }
+
+    /* List of notes */
+    .notes-list {
+      list-style: none;
+    }
+
+    .note-item {
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .note-text {
+      flex: 1;
+      margin-right: 10px;
+      word-break: break-all;
+    }
+
+    .note-actions button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .note-actions button.edit {
+      background-color: #0275d8;
+      color: #fff;
+    }
+
+    .note-actions button.delete {
+      background-color: #d9534f;
+      color: #fff;
+    }
+
+    .note-actions button:hover {
+      opacity: 0.8;
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+
+      input[type="text"], button {
+        font-size: 14px;
+      }
+
+      .note-actions button {
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Notes App</h1>
+    <!-- Note input form -->
+    <form id="noteForm">
+      <input type="text" id="noteInput" placeholder="Type your note here..." required>
+      <button type="submit">Save</button>
+    </form>
+    <!-- List of notes will appear here -->
+    <ul id="notesList" class="notes-list"></ul>
+  </div>
+
+  <script>
+    // Retrieve saved notes from localStorage or initialize as an empty array
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    // DOM element references
+    const noteForm = document.getElementById('noteForm');
+    const noteInput = document.getElementById('noteInput');
+    const notesList = document.getElementById('notesList');
+
+    // Function to save notes array to localStorage
+    function saveNotes() {
+      localStorage.setItem('notes', JSON.stringify(notes));
+    }
+
+    // Function to render the list of notes
+    function renderNotes() {
+      // Clear the current list
+      notesList.innerHTML = '';
+
+      // Loop through notes and create list items for each
+      notes.forEach((note, index) => {
+        const li = document.createElement('li');
+        li.classList.add('note-item');
+
+        // Create a span to display the note text
+        const noteSpan = document.createElement('span');
+        noteSpan.classList.add('note-text');
+        noteSpan.textContent = note;
+        li.appendChild(noteSpan);
+
+        // Container for action buttons (edit and delete)
+        const actionsDiv = document.createElement('div');
+        actionsDiv.classList.add('note-actions');
+
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.classList.add('edit');
+        editBtn.addEventListener('click', () => editNote(index));
+        actionsDiv.appendChild(editBtn);
+
+        // Delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.classList.add('delete');
+        deleteBtn.addEventListener('click', () => deleteNote(index));
+        actionsDiv.appendChild(deleteBtn);
+
+        li.appendChild(actionsDiv);
+
+        // Append the list item to the notes list
+        notesList.appendChild(li);
+      });
+    }
+
+    // Function to handle adding a new note
+    function addNote(noteText) {
+      notes.push(noteText);
+      saveNotes();
+      renderNotes();
+    }
+
+    // Function to handle editing an existing note
+    function editNote(index) {
+      // Prompt user for the new text
+      const newText = prompt('Edit your note:', notes[index]);
+      if (newText !== null && newText.trim() !== '') {
+        notes[index] = newText.trim();
+        saveNotes();
+        renderNotes();
+      }
+    }
+
+    // Function to handle deleting a note
+    function deleteNote(index) {
+      // Remove the note from the array
+      notes.splice(index, 1);
+      saveNotes();
+      renderNotes();
+    }
+
+    // Listen for form submission to add a note
+    noteForm.addEventListener('submit', (e) => {
+      e.preventDefault(); // Prevent the form from refreshing the page
+      const noteText = noteInput.value.trim();
+      if (noteText !== '') {
+        addNote(noteText);
+        noteInput.value = ''; // Clear the input field after saving
+      }
+    });
+
+    // Render any saved notes on initial page load
+    renderNotes();
+  </script>
+</body>
+</html>
