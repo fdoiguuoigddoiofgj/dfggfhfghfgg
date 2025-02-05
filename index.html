@@ -1,241 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Responsive Notes App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Themed Rich Text Editor</title>
   <style>
-    /* Reset some default styles */
+    /* Reset and base styling */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
-    /* Base body styling */
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
-    }
-
-    /* Container for the notes app */
-    .container {
-      background: #fff;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
+      height: 100vh;
+      background: #e8f0fe;
       color: #333;
     }
-
-    /* Form styling */
-    form {
+    /* Blue-themed toolbar styling */
+    .toolbar {
+      background: linear-gradient(135deg, #4285f4, #3367d6);
+      padding: 8px;
+      border-bottom: 1px solid #2a56c6;
       display: flex;
-      flex-direction: column;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
     }
-
-    input[type="text"] {
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    button {
-      padding: 10px;
-      font-size: 16px;
+    .toolbar button,
+    .toolbar select,
+    .toolbar input[type="color"] {
+      margin: 2px;
+      padding: 6px 8px;
+      font-size: 14px;
       border: none;
-      border-radius: 4px;
-      background-color: #5cb85c;
-      color: white;
+      background: #fff;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #4cae4c;
-    }
-
-    /* List of notes */
-    .notes-list {
-      list-style: none;
-    }
-
-    .note-item {
-      padding: 15px;
-      margin-bottom: 10px;
-      background: #fafafa;
-      border: 1px solid #ddd;
       border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+    .toolbar button:hover,
+    .toolbar select:hover,
+    .toolbar input[type="color"]:hover {
+      background: #dce3fc;
+    }
+    .toolbar button:focus {
+      outline: none;
+    }
+    /* Editor styling */
+    #editor {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #d0e1fd;
+      margin: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #editor:focus {
+      outline: none;
+    }
+    /* Status bar styling */
+    .status-bar {
+      background: #d0e1fd;
+      padding: 8px 15px;
+      border-top: 1px solid #a3c0f7;
+      font-size: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .note-text {
-      flex: 1;
-      margin-right: 10px;
-      word-break: break-all;
-    }
-
-    .note-actions button {
-      margin-left: 5px;
-      padding: 5px 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-
-    .note-actions button.edit {
-      background-color: #0275d8;
-      color: #fff;
-    }
-
-    .note-actions button.delete {
-      background-color: #d9534f;
-      color: #fff;
-    }
-
-    .note-actions button:hover {
-      opacity: 0.8;
-    }
-
-    /* Responsive design */
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-      }
-
-      input[type="text"], button {
-        font-size: 14px;
-      }
-
-      .note-actions button {
-        font-size: 12px;
-        padding: 5px 8px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Notes App</h1>
-    <!-- Note input form -->
-    <form id="noteForm">
-      <input type="text" id="noteInput" placeholder="Type your note here..." required>
-      <button type="submit">Save</button>
-    </form>
-    <!-- List of notes will appear here -->
-    <ul id="notesList" class="notes-list"></ul>
+
+  <!-- Toolbar with formatting options -->
+  <div class="toolbar">
+    <!-- Basic Formatting -->
+    <button onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+    <button onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+    <button onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+    <button onclick="execCmd('strikeThrough')" title="Strike-through"><s>S</s></button>
+    
+    <!-- Alignment -->
+    <button onclick="execCmd('justifyLeft')" title="Align Left">Left</button>
+    <button onclick="execCmd('justifyCenter')" title="Center">Center</button>
+    <button onclick="execCmd('justifyRight')" title="Align Right">Right</button>
+    <button onclick="execCmd('justifyFull')" title="Justify">Justify</button>
+    
+    <!-- Lists -->
+    <button onclick="execCmd('insertUnorderedList')" title="Bullet List">&bull; List</button>
+    <button onclick="execCmd('insertOrderedList')" title="Numbered List">1. List</button>
+    
+    <!-- Undo/Redo -->
+    <button onclick="execCmd('undo')" title="Undo">Undo</button>
+    <button onclick="execCmd('redo')" title="Redo">Redo</button>
+    
+    <!-- Headings and Font Size -->
+    <select onchange="execCmdArg('formatBlock', this.value)" title="Heading Style">
+      <option value="">Paragraph</option>
+      <option value="H1">Heading 1</option>
+      <option value="H2">Heading 2</option>
+      <option value="H3">Heading 3</option>
+      <option value="H4">Heading 4</option>
+      <option value="H5">Heading 5</option>
+      <option value="H6">Heading 6</option>
+    </select>
+    <select onchange="execCmdArg('fontSize', this.value)" title="Font Size">
+      <option value="">Font Size</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+    </select>
+    
+    <!-- Font Family -->
+    <select onchange="execCmdArg('fontName', this.value)" title="Font Family">
+      <option value="">Font Family</option>
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Verdana">Verdana</option>
+    </select>
+    
+    <!-- Text Color and Background Color -->
+    <input type="color" onchange="execCmdArg('foreColor', this.value)" title="Font Color">
+    <input type="color" onchange="execCmdArg('hiliteColor', this.value)" title="Background Color">
+    
+    <!-- Link and Image -->
+    <button onclick="insertLink()" title="Insert Link">Link</button>
+    <button onclick="insertImage()" title="Insert Image">Image</button>
+    
+    <!-- Additional Tools -->
+    <button onclick="execCmd('removeFormat')" title="Clear Formatting">Clear Format</button>
+    <button onclick="execCmd('insertHorizontalRule')" title="Insert Horizontal Rule">HR</button>
+    <button onclick="execCmd('subscript')" title="Subscript">Sub</button>
+    <button onclick="execCmd('superscript')" title="Superscript">Sup</button>
+    <button onclick="execCmd('indent')" title="Indent">Indent</button>
+    <button onclick="execCmd('outdent')" title="Outdent">Outdent</button>
+    <button onclick="insertTable()" title="Insert Table">Table</button>
+  </div>
+
+  <!-- Editable content area -->
+  <div id="editor" contenteditable="true">
+    <p>Start typing your document here...</p>
+  </div>
+
+  <!-- Status bar showing word count and auto-save status -->
+  <div class="status-bar">
+    <span id="wordCount">Words: 0</span>
+    <span id="saveStatus">Saved</span>
   </div>
 
   <script>
-    // Retrieve saved notes from localStorage or initialize as an empty array
-    let notes = JSON.parse(localStorage.getItem('notes')) || [];
-
-    // DOM element references
-    const noteForm = document.getElementById('noteForm');
-    const noteInput = document.getElementById('noteInput');
-    const notesList = document.getElementById('notesList');
-
-    // Function to save notes array to localStorage
-    function saveNotes() {
-      localStorage.setItem('notes', JSON.stringify(notes));
+    // Execute a command with no argument
+    function execCmd(command) {
+      document.execCommand(command, false, null);
+      updateWordCount();
     }
-
-    // Function to render the list of notes
-    function renderNotes() {
-      // Clear the current list
-      notesList.innerHTML = '';
-
-      // Loop through notes and create list items for each
-      notes.forEach((note, index) => {
-        const li = document.createElement('li');
-        li.classList.add('note-item');
-
-        // Create a span to display the note text
-        const noteSpan = document.createElement('span');
-        noteSpan.classList.add('note-text');
-        noteSpan.textContent = note;
-        li.appendChild(noteSpan);
-
-        // Container for action buttons (edit and delete)
-        const actionsDiv = document.createElement('div');
-        actionsDiv.classList.add('note-actions');
-
-        // Edit button
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.classList.add('edit');
-        editBtn.addEventListener('click', () => editNote(index));
-        actionsDiv.appendChild(editBtn);
-
-        // Delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('delete');
-        deleteBtn.addEventListener('click', () => deleteNote(index));
-        actionsDiv.appendChild(deleteBtn);
-
-        li.appendChild(actionsDiv);
-
-        // Append the list item to the notes list
-        notesList.appendChild(li);
-      });
+    
+    // Execute a command with an argument
+    function execCmdArg(command, arg) {
+      document.execCommand(command, false, arg);
+      updateWordCount();
     }
-
-    // Function to handle adding a new note
-    function addNote(noteText) {
-      notes.push(noteText);
-      saveNotes();
-      renderNotes();
-    }
-
-    // Function to handle editing an existing note
-    function editNote(index) {
-      // Prompt user for the new text
-      const newText = prompt('Edit your note:', notes[index]);
-      if (newText !== null && newText.trim() !== '') {
-        notes[index] = newText.trim();
-        saveNotes();
-        renderNotes();
+    
+    // Insert a hyperlink
+    function insertLink() {
+      const url = prompt("Enter the URL for the link:", "https://");
+      if (url) {
+        document.execCommand('createLink', false, url);
       }
     }
-
-    // Function to handle deleting a note
-    function deleteNote(index) {
-      // Remove the note from the array
-      notes.splice(index, 1);
-      saveNotes();
-      renderNotes();
-    }
-
-    // Listen for form submission to add a note
-    noteForm.addEventListener('submit', (e) => {
-      e.preventDefault(); // Prevent the form from refreshing the page
-      const noteText = noteInput.value.trim();
-      if (noteText !== '') {
-        addNote(noteText);
-        noteInput.value = ''; // Clear the input field after saving
+    
+    // Insert an image by URL
+    function insertImage() {
+      const url = prompt("Enter the image URL:", "https://");
+      if (url) {
+        document.execCommand('insertImage', false, url);
       }
-    });
-
-    // Render any saved notes on initial page load
-    renderNotes();
+    }
+    
+    // Insert a table by prompting for rows and columns
+    function insertTable() {
+      const rows = parseInt(prompt("Enter number of rows:", "2"));
+      const cols = parseInt(prompt("Enter number of columns:", "2"));
+      if (rows > 0 && cols > 0) {
+        let table = '<table border="1" style="border-collapse: collapse; width:100%;">';
+        for (let i = 0; i < rows; i++) {
+          table += '<tr>';
+          for (let j = 0; j < cols; j++) {
+            table += '<td>&nbsp;</td>';
+          }
+          table += '</tr>';
+        }
+        table += '</table><br>';
+        document.execCommand('insertHTML', false, table);
+      }
+    }
+    
+    // Update the word count based on the editor's text
+    function updateWordCount() {
+      const editor = document.getElementById('editor');
+      const text = editor.innerText || "";
+      // Split by whitespace and filter out empty entries
+      const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+      document.getElementById('wordCount').textContent = 'Words: ' + words.length;
+    }
+    
+    // Auto-save the content every 5 seconds to localStorage
+    function saveContent() {
+      const content = document.getElementById('editor').innerHTML;
+      localStorage.setItem('editorContent', content);
+      document.getElementById('saveStatus').textContent = 'Saved at ' + new Date().toLocaleTimeString();
+    }
+    
+    // Load saved content when the page loads
+    window.onload = function() {
+      const savedContent = localStorage.getItem('editorContent');
+      if (savedContent) {
+        document.getElementById('editor').innerHTML = savedContent;
+      }
+      updateWordCount();
+    };
+    
+    // Set up auto-save interval (every 5 seconds)
+    setInterval(saveContent, 5000);
+    
+    // Update word count on user input events
+    const editor = document.getElementById('editor');
+    editor.addEventListener('keyup', updateWordCount);
+    editor.addEventListener('paste', () => setTimeout(updateWordCount, 100));
   </script>
 </body>
 </html>
